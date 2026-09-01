@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Prescription Validator</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+    <div class="container">
+
+        <header>
+            <h1>Prescription Validator</h1>
+
+            <p>
+                Basic prescription decision-support and validation system
+            </p>
+        </header>
+
+
+        <section class="card">
+
+            <h2>Prescription Details</h2>
+
+            <form action="/validate"
+                  method="POST"
+                  id="prescriptionForm">
+
+                <label for="patient_name">
+                    Patient Name
+                </label>
+
+                <input
+                    type="text"
+                    id="patient_name"
+                    name="patient_name"
+                    value="{{ old_patient_name|default('') }}"
+                    placeholder="Enter patient name"
+                >
+
+
+                <label for="doctor_name">
+                    Doctor Name
+                </label>
+
+                <input
+                    type="text"
+                    id="doctor_name"
+                    name="doctor_name"
+                    value="{{ old_doctor_name|default('') }}"
+                    placeholder="Enter doctor name"
+                >
+
+
+                <label for="prescription_date">
+                    Prescription Date
+                </label>
+
+                <input
+                    type="date"
+                    id="prescription_date"
+                    name="prescription_date"
+                    value="{{ old_date|default('') }}"
+                >
+
+
+                <label for="medicine_text">
+                    Medicine Details
+                </label>
+
+                <textarea
+                    id="medicine_text"
+                    name="medicine_text"
+                    rows="7"
+                    placeholder="Medicine Name, Dosage, Schedule&#10;&#10;Example:&#10;Paracetamol, 500 mg, twice daily&#10;Amoxicillin, 500 mg, three times daily"
+                >{{ old_medicine_text|default('') }}</textarea>
+
+
+                <div class="format-box">
+
+                    <strong>Required Format:</strong>
+
+                    <p>
+                        Medicine Name, Dosage, Schedule
+                    </p>
+
+                    <p>
+                        Example: Paracetamol, 500 mg, twice daily
+                    </p>
+
+                </div>
+
+
+                <button type="submit">
+                    Validate Prescription
+                </button>
+
+            </form>
+
+        </section>
+
+
+        {% if result %}
+
+        <section class="results">
+
+            <h2>Validation Result</h2>
+
+
+            <div class="result-card">
+
+                <h3>Missing Fields</h3>
+
+                {% if result.missing_fields %}
+
+                    <ul class="warning-list">
+
+                        {% for field in result.missing_fields %}
+
+                            <li>{{ field }}</li>
+
+                        {% endfor %}
+
+                    </ul>
+
+                {% else %}
+
+                    <p class="success">
+                        No required fields are missing.
+                    </p>
+
+                {% endif %}
+
+            </div>
+
+
+            <div class="result-card">
+
+                <h3>Medicine Details</h3>
+
+                {% if result.medicines %}
+
+                    <table>
+
+                        <tr>
+                            <th>Medicine</th>
+                            <th>Dosage</th>
+                            <th>Schedule</th>
+                        </tr>
+
+                        {% for medicine in result.medicines %}
+
+                        <tr>
+
+                            <td>{{ medicine.name }}</td>
+
+                            <td>{{ medicine.dosage }}</td>
+
+                            <td>{{ medicine.schedule }}</td>
+
+                        </tr>
+
+                        {% endfor %}
+
+                    </table>
+
+                {% else %}
+
+                    <p>
+                        No valid medicine entries were found.
+                    </p>
+
+                {% endif %}
+
+            </div>
+
+
+            <div class="result-card">
+
+                <h3>Duplicate Medicines</h3>
+
+                {% if result.duplicates %}
+
+                    <ul class="warning-list">
+
+                        {% for medicine in result.duplicates %}
+
+                            <li>
+                                {{ medicine }}
+                            </li>
+
+                        {% endfor %}
+
+                    </ul>
+
+                {% else %}
+
+                    <p class="success">
+                        No duplicate medicines detected.
+                    </p>
+
+                {% endif %}
+
+            </div>
+
+
+            <div class="result-card">
+
+                <h3>Alerts</h3>
+
+                <ul class="alert-list">
+
+                    {% for alert in result.alerts %}
+
+                        <li>
+                            {{ alert }}
+                        </li>
+
+                    {% endfor %}
+
+                </ul>
+
+            </div>
+
+
+            <div class="disclaimer">
+
+                <strong>Important:</strong>
+
+                This project performs basic format and consistency
+                checks for educational purposes. It does not determine
+                whether a medicine or dosage is medically appropriate.
+                A qualified healthcare professional should review
+                prescriptions.
+
+            </div>
+
+        </section>
+
+        {% endif %}
+
+
+        <footer>
+
+            <p>
+                BSc IT Semester 3 Python Project
+            </p>
+
+            <p>
+                Prescription Validator
+            </p>
+
+        </footer>
+
+    </div>
+
+
+    <script src="{{ url_for('static', filename='script.js') }}">
+    </script>
+
+</body>
+
+</html>
